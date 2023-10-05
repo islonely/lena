@@ -1,2 +1,2 @@
 # lena
- An editor with the primary focus of V programming.
+A cross-platform editor with the primary focus of V programming.
