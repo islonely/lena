@@ -55,7 +55,7 @@ fn get_one_size_smaller_than(size mouse.Size) ?mouse.Size {
 struct Lena {
 pub mut:
 	context      &gg.Context = unsafe { nil }
-	editor_views []lenaui.TextArea
+	editor_views []&lenaui.TextArea
 }
 
 fn (mut lena Lena) init(_ voidptr) {
