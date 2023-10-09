@@ -1,0 +1,3 @@
+[submodule "src/lenaui"]
+	path = src/lenaui
+	url = https://github.com/islonely/lenaui
