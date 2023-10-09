@@ -55,8 +55,8 @@ fn get_one_size_smaller_than(size mouse.Size) ?mouse.Size {
 [heap]
 struct Lena {
 pub mut:
-	context &gg.Context  = unsafe { nil }
-	root    &lenaui.View = unsafe { nil }
+	context &gg.Context       = unsafe { nil }
+	root    &lenaui.Component = unsafe { nil }
 }
 
 fn (mut lena Lena) init(_ voidptr) {
@@ -64,51 +64,45 @@ fn (mut lena Lena) init(_ voidptr) {
 	file_contents_2 := os.read_file(@VMODROOT + '/v.mod') or { panic('failed to read file') }
 	tab_view_width := lena.context.width
 	tab_view_height := lena.context.height
-	lena.root = &lenaui.TabView{
+	mut view := &lenaui.TabView{
 		context: lena.context
 		width: tab_view_width
 		height: tab_view_height
-		tabs: [
-			&lenaui.Tab{
-				short_name: 'main.v'
-				full_name: os.abs_path(@VMODROOT + '/src/main.v')
-				view: &lenaui.View(&lenaui.StandardView{
-					context: lena.context
-					width: tab_view_width
-					height: tab_view_height
-					children: [
-						lenaui.TextArea.new(
-							context: lena.context
-							width: tab_view_width
-							height: tab_view_height
-							text: file_contents
-							cursor: lenaui.LineCursor.new()
-						),
-					]
-				})
-			},
-			&lenaui.Tab{
-				short_name: 'v.mod'
-				full_name: os.abs_path(@VMODROOT + '/v.mod')
-				view: &lenaui.View(&lenaui.StandardView{
-					context: lena.context
-					width: tab_view_width
-					height: tab_view_height
-					children: [
-						lenaui.TextArea.new(
-							context: lena.context
-							width: tab_view_width
-							height: tab_view_height
-							text: file_contents_2
-							cursor: lenaui.LineCursor.new()
-						),
-					]
-				})
-			},
-		]
 	}
-	mut root_view := unsafe { &lenaui.Component(lena.root as lenaui.TabView) }
-	root_view.establish_parent()
+	view.push_tab(&lenaui.Tab{
+		short_name: 'main.v'
+		full_name: os.abs_path(@VMODROOT + '/src/main.v')
+		view: &lenaui.StandardView{
+			context: lena.context
+			width: tab_view_width
+			height: tab_view_height
+		}
+	})
+	view.tabs[0].view.push_child(lenaui.TextArea.new(
+		context: lena.context
+		width: tab_view_width
+		height: tab_view_height
+		text: file_contents
+		cursor: lenaui.LineCursor.new()
+	))
+	view.push_tab(&lenaui.Tab{
+		short_name: 'v.mod'
+		full_name: os.abs_path(@VMODROOT + '/v.mod')
+		view: &lenaui.StandardView{
+			context: lena.context
+			width: tab_view_width
+			height: tab_view_height
+		}
+	})
+	view.tabs[1].view.push_child(lenaui.TextArea.new(
+		context: lena.context
+		width: tab_view_width
+		height: tab_view_height
+		text: file_contents_2
+		cursor: lenaui.LineCursor.new()
+	))
+
+	lena.root = view
 }
 
 fn (mut lena Lena) event(event &gg.Event, _ voidptr) {
